@@ -537,7 +537,9 @@
             border-radius: 10px;
             padding: 30px;
             width: 90%;
-            max-width: 500px;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
             box-shadow: var(--shadow);
             border: 1px solid var(--border);
             position: relative;
@@ -614,6 +616,29 @@
             font-size: 0.9rem;
         }
         
+        .contact-links {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .contact-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--accent);
+            text-decoration: none;
+            padding: 8px 15px;
+            border: 1px solid var(--accent);
+            border-radius: 5px;
+            transition: var(--transition);
+        }
+        
+        .contact-link:hover {
+            background: var(--accent);
+            color: #000;
+        }
+        
         /* User Info */
         .user-info {
             display: flex;
@@ -631,6 +656,51 @@
             justify-content: center;
             color: #000;
             font-weight: bold;
+        }
+        
+        /* Transaction History */
+        .transaction-history {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .transaction-item:last-child {
+            border-bottom: none;
+        }
+        
+        .transaction-info {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .transaction-type {
+            font-weight: 600;
+        }
+        
+        .transaction-buy {
+            color: var(--profit);
+        }
+        
+        .transaction-sell {
+            color: var(--loss);
+        }
+        
+        .transaction-details {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        .transaction-amount {
+            font-weight: 600;
         }
         
         /* Responsive Adjustments */
@@ -665,6 +735,10 @@
             .chart-container {
                 height: 400px;
             }
+            
+            .contact-links {
+                flex-direction: column;
+            }
         }
         
         @media (max-width: 480px) {
@@ -694,6 +768,24 @@
         .offline-indicator.show {
             display: block;
             animation: fadeIn 0.5s ease;
+        }
+        
+        /* Tabs */
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+        }
+        
+        .tab.active {
+            border-bottom: 2px solid var(--accent);
+            color: var(--accent);
         }
     </style>
 </head>
@@ -769,8 +861,8 @@
                 <button class="close-modal" id="close-about">&times;</button>
             </div>
             <div class="about-content">
-                <h3>Bassam - Full Stack Developer</h3>
-                <p>Hello! I'm Bassam, a passionate full-stack developer with expertise in creating modern, responsive web applications. With several years of experience in the field, I specialize in building intuitive user interfaces and robust backend systems.</p>
+                <h3>Bassam Khan - Full Stack Developer</h3>
+                <p>Hello! I'm Bassam Khan, a passionate full-stack developer with expertise in creating modern, responsive web applications. With several years of experience in the field, I specialize in building intuitive user interfaces and robust backend systems.</p>
                 
                 <h3>Skills & Technologies</h3>
                 <div class="skills">
@@ -783,6 +875,9 @@
                     <span class="skill-tag">SQL</span>
                     <span class="skill-tag">MongoDB</span>
                     <span class="skill-tag">UI/UX Design</span>
+                    <span class="skill-tag">API Development</span>
+                    <span class="skill-tag">Git & GitHub</span>
+                    <span class="skill-tag">Responsive Design</span>
                 </div>
                 
                 <h3>About This Project</h3>
@@ -794,12 +889,39 @@
                     <li>Responsive design that works on all devices</li>
                     <li>Dark/light mode toggle for user preference</li>
                     <li>User authentication system</li>
+                    <li>Transaction history tracking</li>
+                    <li>Offline functionality</li>
                 </ul>
                 
                 <h3>Contact Information</h3>
                 <p>If you're interested in collaborating or have any questions, feel free to reach out:</p>
-                <p>Email: bassam@example.com</p>
-                <p>Portfolio: www.bassamdev.com</p>
+                
+                <div class="contact-links">
+                    <a href="mailto:bassaamkhan9nb@gmail.com" class="contact-link">
+                        <i class="fas fa-envelope"></i> Email
+                    </a>
+                    <a href="https://github.com/bassam9nb" target="_blank" class="contact-link">
+                        <i class="fab fa-github"></i> GitHub
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Transaction History Modal -->
+    <div class="modal" id="transaction-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Transaction History</h2>
+                <button class="close-modal" id="close-transaction">&times;</button>
+            </div>
+            <div class="tabs">
+                <div class="tab active" data-tab="all">All Transactions</div>
+                <div class="tab" data-tab="trades">Trades</div>
+                <div class="tab" data-tab="deposits">Deposits/Withdrawals</div>
+            </div>
+            <div class="transaction-history" id="transaction-history">
+                <!-- Transactions will be dynamically added here -->
             </div>
         </div>
     </div>
@@ -815,11 +937,13 @@
                         <button class="auth-btn" id="signin-btn">Sign In</button>
                         <button class="auth-btn" id="signup-btn">Sign Up</button>
                         <button class="about-btn" id="about-btn">About Me</button>
+                        <button class="auth-btn" id="transaction-btn">Transaction History</button>
                     </div>
                     <div class="user-info" id="user-info" style="display: none;">
                         <div class="user-avatar" id="user-avatar">B</div>
                         <span id="user-name">Bassam</span>
                         <button class="auth-btn" id="logout-btn">Logout</button>
+                        <button class="auth-btn" id="user-transaction-btn">Transactions</button>
                     </div>
                     <div class="theme-toggle" id="theme-toggle">
                         <i class="fas fa-moon" id="theme-icon"></i>
@@ -914,7 +1038,13 @@
                 </div>
                 <!-- TradingView Widget -->
                 <div class="tradingview-widget-container">
-                    <div id="tradingview-widget"></div>
+                    <div class="tradingview-widget-container__widget" id="tradingview-widget"></div>
+                    <div class="tradingview-widget-copyright">
+                        <a href="https://www.tradingview.com/symbols/XAUUSD/?exchange=OANDA" rel="noopener nofollow" target="_blank">
+                            <span class="blue-text">XAUUSD quote</span>
+                        </a>
+                        <span class="trademark">&nbsp;by TradingView</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -931,6 +1061,7 @@
         const state = {
             balance: 100000,
             positions: [],
+            transactions: [],
             currentPrice: 0,
             priceHistory: [],
             tradeType: 'buy',
@@ -965,17 +1096,23 @@
             signinBtn: document.getElementById('signin-btn'),
             signupBtn: document.getElementById('signup-btn'),
             aboutBtn: document.getElementById('about-btn'),
+            transactionBtn: document.getElementById('transaction-btn'),
+            userTransactionBtn: document.getElementById('user-transaction-btn'),
             // Modal elements
             signinModal: document.getElementById('signin-modal'),
             signupModal: document.getElementById('signup-modal'),
             aboutModal: document.getElementById('about-modal'),
+            transactionModal: document.getElementById('transaction-modal'),
             closeSignin: document.getElementById('close-signin'),
             closeSignup: document.getElementById('close-signup'),
             closeAbout: document.getElementById('close-about'),
+            closeTransaction: document.getElementById('close-transaction'),
             signinForm: document.getElementById('signin-form'),
             signupForm: document.getElementById('signup-form'),
             switchToSignup: document.getElementById('switch-to-signup'),
-            switchToSignin: document.getElementById('switch-to-signin')
+            switchToSignin: document.getElementById('switch-to-signin'),
+            transactionHistory: document.getElementById('transaction-history'),
+            tabs: document.querySelectorAll('.tab')
         };
 
         // Initialize the application
@@ -1017,6 +1154,7 @@
                 const parsedState = JSON.parse(savedState);
                 state.balance = parsedState.balance || 100000;
                 state.positions = parsedState.positions || [];
+                state.transactions = parsedState.transactions || [];
                 state.theme = parsedState.theme || 'dark';
                 state.user = parsedState.user || null;
             }
@@ -1033,6 +1171,7 @@
             localStorage.setItem('bassaXAUState', JSON.stringify({
                 balance: state.balance,
                 positions: state.positions,
+                transactions: state.transactions,
                 theme: state.theme,
                 user: state.user
             }));
@@ -1092,12 +1231,15 @@
             elements.signinBtn.addEventListener('click', () => openModal('signin'));
             elements.signupBtn.addEventListener('click', () => openModal('signup'));
             elements.aboutBtn.addEventListener('click', () => openModal('about'));
+            elements.transactionBtn.addEventListener('click', () => openModal('transaction'));
+            elements.userTransactionBtn.addEventListener('click', () => openModal('transaction'));
             elements.logoutBtn.addEventListener('click', logout);
             
             // Modal close buttons
             elements.closeSignin.addEventListener('click', () => closeModal('signin'));
             elements.closeSignup.addEventListener('click', () => closeModal('signup'));
             elements.closeAbout.addEventListener('click', () => closeModal('about'));
+            elements.closeTransaction.addEventListener('click', () => closeModal('transaction'));
             
             // Auth form submissions
             elements.signinForm.addEventListener('submit', handleSignIn);
@@ -1112,6 +1254,15 @@
             elements.switchToSignin.addEventListener('click', () => {
                 closeModal('signup');
                 openModal('signin');
+            });
+            
+            // Tab switching
+            elements.tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    elements.tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    updateTransactionHistory(tab.getAttribute('data-tab'));
+                });
             });
             
             // Close modals when clicking outside
@@ -1130,6 +1281,9 @@
                 elements.signupModal.classList.add('active');
             } else if (modalType === 'about') {
                 elements.aboutModal.classList.add('active');
+            } else if (modalType === 'transaction') {
+                elements.transactionModal.classList.add('active');
+                updateTransactionHistory('all');
             }
         }
 
@@ -1141,6 +1295,8 @@
                 elements.signupModal.classList.remove('active');
             } else if (modalType === 'about') {
                 elements.aboutModal.classList.remove('active');
+            } else if (modalType === 'transaction') {
+                elements.transactionModal.classList.remove('active');
             }
         }
 
@@ -1175,13 +1331,16 @@
             // Simple validation (in a real app, this would be more secure)
             if (email && password) {
                 state.user = {
-                    name: "Bassam",
+                    name: "Bassam Khan",
                     email: email
                 };
                 saveState();
                 updateAuthUI();
                 closeModal('signin');
                 showNotification('Successfully signed in!', 'success');
+                
+                // Add a welcome transaction
+                addTransaction('deposit', 100000, 'Demo account initialization');
             } else {
                 showNotification('Please fill in all fields', 'error');
             }
@@ -1214,6 +1373,9 @@
             updateAuthUI();
             closeModal('signup');
             showNotification('Account created successfully!', 'success');
+            
+            // Add a welcome transaction
+            addTransaction('deposit', 100000, 'Demo account initialization');
         }
 
         // Handle logout
@@ -1222,6 +1384,100 @@
             saveState();
             updateAuthUI();
             showNotification('You have been logged out', 'info');
+        }
+
+        // Add transaction to history
+        function addTransaction(type, amount, description, price = null, pnl = null) {
+            const transaction = {
+                id: Date.now(),
+                type: type,
+                amount: amount,
+                description: description,
+                price: price,
+                pnl: pnl,
+                timestamp: new Date().toISOString(),
+                date: new Date().toLocaleDateString(),
+                time: new Date().toLocaleTimeString()
+            };
+            
+            state.transactions.unshift(transaction);
+            saveState();
+        }
+
+        // Update transaction history display
+        function updateTransactionHistory(filter = 'all') {
+            elements.transactionHistory.innerHTML = '';
+            
+            let filteredTransactions = state.transactions;
+            
+            if (filter === 'trades') {
+                filteredTransactions = state.transactions.filter(t => 
+                    t.type === 'buy' || t.type === 'sell' || t.type === 'close');
+            } else if (filter === 'deposits') {
+                filteredTransactions = state.transactions.filter(t => 
+                    t.type === 'deposit' || t.type === 'withdrawal');
+            }
+            
+            if (filteredTransactions.length === 0) {
+                elements.transactionHistory.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: var(--text); opacity: 0.7;">
+                        <i class="fas fa-history" style="font-size: 3rem; margin-bottom: 15px;"></i>
+                        <p>No transactions found</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            filteredTransactions.forEach(transaction => {
+                const transactionEl = document.createElement('div');
+                transactionEl.className = 'transaction-item';
+                
+                let amountDisplay = '';
+                let typeClass = '';
+                
+                if (transaction.type === 'buy') {
+                    amountDisplay = `-$${transaction.amount.toFixed(2)}`;
+                    typeClass = 'transaction-buy';
+                } else if (transaction.type === 'sell') {
+                    amountDisplay = `+$${transaction.amount.toFixed(2)}`;
+                    typeClass = 'transaction-sell';
+                } else if (transaction.type === 'close') {
+                    if (transaction.pnl >= 0) {
+                        amountDisplay = `+$${Math.abs(transaction.pnl).toFixed(2)}`;
+                        typeClass = 'transaction-buy';
+                    } else {
+                        amountDisplay = `-$${Math.abs(transaction.pnl).toFixed(2)}`;
+                        typeClass = 'transaction-sell';
+                    }
+                } else if (transaction.type === 'deposit') {
+                    amountDisplay = `+$${transaction.amount.toFixed(2)}`;
+                    typeClass = 'transaction-buy';
+                } else if (transaction.type === 'withdrawal') {
+                    amountDisplay = `-$${transaction.amount.toFixed(2)}`;
+                    typeClass = 'transaction-sell';
+                }
+                
+                transactionEl.innerHTML = `
+                    <div class="transaction-info">
+                        <div class="transaction-type ${typeClass}">
+                            ${transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1)}
+                            ${transaction.price ? ` @ $${transaction.price.toFixed(2)}` : ''}
+                        </div>
+                        <div class="transaction-details">
+                            ${transaction.description}
+                            ${transaction.pnl !== null ? ` | P&L: $${transaction.pnl >= 0 ? '+' : ''}${transaction.pnl.toFixed(2)}` : ''}
+                        </div>
+                        <div class="transaction-details">
+                            ${transaction.date} ${transaction.time}
+                        </div>
+                    </div>
+                    <div class="transaction-amount ${typeClass}">
+                        ${amountDisplay}
+                    </div>
+                `;
+                
+                elements.transactionHistory.appendChild(transactionEl);
+            });
         }
 
         // Set trade type (buy/sell)
@@ -1270,6 +1526,14 @@
             // Update balance
             state.balance -= amount;
             
+            // Add transaction to history
+            addTransaction(
+                state.tradeType, 
+                amount, 
+                `${state.tradeType.toUpperCase()} XAU/USD`, 
+                state.currentPrice
+            );
+            
             // Save state
             saveState();
             
@@ -1302,6 +1566,15 @@
             // Update balance with P&L
             state.balance += position.amount + pnl;
             
+            // Add transaction to history
+            addTransaction(
+                'close', 
+                position.amount, 
+                `Closed ${position.type} position`, 
+                state.currentPrice,
+                pnl
+            );
+            
             // Remove position
             state.positions.splice(positionIndex, 1);
             
@@ -1318,8 +1591,17 @@
         // Reset demo account
         function resetAccount() {
             if (confirm('Are you sure you want to reset your demo account? All open positions will be closed.')) {
+                // Add withdrawal transaction for current balance
+                if (state.balance > 0) {
+                    addTransaction('withdrawal', state.balance, 'Account reset');
+                }
+                
                 state.balance = 100000;
                 state.positions = [];
+                
+                // Add deposit transaction for reset amount
+                addTransaction('deposit', 100000, 'Account reset to demo balance');
+                
                 saveState();
                 updateUI();
                 showNotification('Demo account reset to $100,000', 'success');
@@ -1455,7 +1737,7 @@
             });
         }
 
-        // Initialize TradingView widget
+        // Initialize TradingView widget with your specific code
         function initTradingViewWidget() {
             const widgetContainer = document.getElementById('tradingview-widget');
             widgetContainer.innerHTML = '';
@@ -1463,26 +1745,61 @@
             // Create script element for TradingView widget
             const script = document.createElement('script');
             script.type = 'text/javascript';
-            script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
+            script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-symbol-overview.js';
             script.async = true;
             script.innerHTML = JSON.stringify({
-                "autosize": true,
-                "symbol": "OANDA:XAUUSD",
-                "interval": "D",
-                "timezone": "Etc/UTC",
-                "theme": state.theme,
-                "style": "1",
+                "lineWidth": 2,
+                "lineType": 0,
+                "chartType": "candlesticks",
+                "fontColor": state.theme === 'dark' ? "rgb(224, 224, 224)" : "rgb(106, 109, 120)",
+                "gridLineColor": state.theme === 'dark' ? "rgba(46, 46, 46, 0.8)" : "rgba(46, 46, 46, 0.06)",
+                "volumeUpColor": "rgba(34, 171, 148, 0.5)",
+                "volumeDownColor": "rgba(247, 82, 95, 0.5)",
+                "backgroundColor": state.theme === 'dark' ? "#1e2a3a" : "#ffffff",
+                "widgetFontColor": state.theme === 'dark' ? "#e0e0e0" : "#0F0F0F",
+                "upColor": "#22ab94",
+                "downColor": "#f7525f",
+                "borderUpColor": "#22ab94",
+                "borderDownColor": "#f7525f",
+                "wickUpColor": "#22ab94",
+                "wickDownColor": "#f7525f",
+                "colorTheme": state.theme,
+                "isTransparent": false,
                 "locale": "en",
-                "enable_publishing": false,
-                "allow_symbol_change": true,
-                "container_id": "tradingview-widget",
-                "studies": [
-                    "BB@tv-basicstudies"
+                "chartOnly": false,
+                "scalePosition": "right",
+                "scaleMode": "Normal",
+                "fontFamily": "-apple-system, BlinkMacSystemFont, Trebuchet MS, Roboto, Ubuntu, sans-serif",
+                "valuesTracking": "1",
+                "changeMode": "price-and-percent",
+                "symbols": [
+                    [
+                        "OANDA:XAUUSD|ALL"
+                    ]
                 ],
-                "show_popup_button": true,
-                "popup_width": "1000",
-                "popup_height": "650",
-                "support_host": "https://www.tradingview.com"
+                "dateRanges": [
+                    "1d|1",
+                    "1m|30",
+                    "3m|60",
+                    "12m|1D",
+                    "60m|1W",
+                    "all|1M"
+                ],
+                "fontSize": "10",
+                "headerFontSize": "medium",
+                "autosize": false,
+                "width": 654,
+                "height": 500,
+                "noTimeScale": false,
+                "hideDateRanges": false,
+                "compareSymbol": {
+                    "symbol": "OANDA:XAUUSD",
+                    "lineColor": "#FF9800",
+                    "lineWidth": 2,
+                    "showLabels": true
+                },
+                "hideMarketStatus": false,
+                "hideSymbolLogo": false
             });
             
             widgetContainer.appendChild(script);
